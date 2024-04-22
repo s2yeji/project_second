@@ -1,9 +1,11 @@
 const API_KEY =
   'dRzoRJA7g4wPJN6t%2B1iCdSk9ZN%2BTwsKib6q%2BqOaA0B6wktWtjRmACTZnjZ4lqr3MUQmatHxTP1qg8SPTa4Nupw%3D%3D';
-/*
-  const hd = document.querySelector('header');
-  const hdInner = hd.querySelector('.inner');
-*/
+const searchBtn = document.querySelector('.btnSearch');
+const searchInput = document.querySelector('.inputArea input');
+let page = 1;
+let pageSize = 8;
+let totalResults = 0;
+let groupSize = 5;
 
 /*
   const ham = document.createElement('div');
@@ -16,11 +18,7 @@ const API_KEY =
   hdInner.appendChild(ham);
 */
 
-// 1
-const getLatestDatas = async () => {
-  const url = new URL(
-    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=1&numOfRows=10`
-  );
+const fetchCafe = async (url) => {
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -29,30 +27,39 @@ const getLatestDatas = async () => {
   });
   const data = await response.json();
   let cafeList = data.response.body.items.item;
-  console.log(data);
-  /*
-    const img = dataList.map((item) => item.CON_IMGFILENAME);
-    const title = dataList.map((item) => item.CON_TITLE);
-    const srcTitle = dataList.map((item) => item.SRC_TITLE);
-    const content = dataList.map((item) => item.CON_CONTENT);
-    const summary = dataList.map((item) => item.CON_SUMMARY);
-    const keywords = dataList.map((item) => item.CON_KEYWORDS);
-    const address = dataList.map((item) => item.CON_ADDRESS);
-    const phone = dataList.map((item) => item.CON_PHONE);
-    const homepage = dataList.map((item) => item.CON_HOMEPAGE);
-    console.log(img);
-    console.log(title);
-    console.log(srcTitle);
-    console.log(content);
-    console.log(summary);
-    console.log(keywords);
-    console.log(address);
-    console.log(phone);
-    console.log(homepage);
-  */
-
   renderCafe(cafeList);
 };
+
+const searchFn = () => {
+  const searchWord = searchInput.value;
+  searchInput.value = '';
+  const url = new URL(`
+    https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}&CON_KEYWORDS=${searchWord}
+  `);
+  fetchCafe(url);
+};
+
+searchBtn.addEventListener('click', async () => {
+  searchFn();
+});
+
+searchInput.addEventListener('keypress', (e) => {
+  if (e.key !== 'Enter') return;
+  searchFn();
+});
+
+//
+// searchBtn.addEventListener('click', async () => {
+//   const searchInput = document.querySelector('.inputArea input');
+//   const searchWord = searchInput.value;
+//   console.log(searchWord);
+
+//   const url = new URL(`
+//     https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}&CON_KEYWORDS=${searchWord}
+//   `);
+
+//   fetchCafe(url);
+// });
 
 // 3
 const createHtml = (cafe) => {
@@ -100,6 +107,42 @@ const createHtml = (cafe) => {
 const renderCafe = (cafeList) => {
   const cafeHtml = cafeList.map((cafe) => createHtml(cafe)).join('');
   document.querySelector('.cafeList').innerHTML = cafeHtml;
+};
+
+// 1
+const getLatestDatas = async () => {
+  const url = new URL(
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}`
+  );
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+    },
+  });
+
+  /*
+    const img = dataList.map((item) => item.CON_IMGFILENAME);
+    const title = dataList.map((item) => item.CON_TITLE);
+    const srcTitle = dataList.map((item) => item.SRC_TITLE);
+    const content = dataList.map((item) => item.CON_CONTENT);
+    const summary = dataList.map((item) => item.CON_SUMMARY);
+    const keywords = dataList.map((item) => item.CON_KEYWORDS);
+    const address = dataList.map((item) => item.CON_ADDRESS);
+    const phone = dataList.map((item) => item.CON_PHONE);
+    const homepage = dataList.map((item) => item.CON_HOMEPAGE);
+    console.log(img);
+    console.log(title);
+    console.log(srcTitle);
+    console.log(content);
+    console.log(summary);
+    console.log(keywords);
+    console.log(address);
+    console.log(phone);
+    console.log(homepage);
+  */
+
+  fetchCafe(url);
 };
 
 getLatestDatas();
