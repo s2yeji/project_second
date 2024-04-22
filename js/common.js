@@ -2,6 +2,7 @@ const API_KEY =
   'dRzoRJA7g4wPJN6t%2B1iCdSk9ZN%2BTwsKib6q%2BqOaA0B6wktWtjRmACTZnjZ4lqr3MUQmatHxTP1qg8SPTa4Nupw%3D%3D';
 const searchBtn = document.querySelector('.btnSearch');
 const searchInput = document.querySelector('.inputArea input');
+const newMessage = document.querySelector('.cafeList');
 let page = 1;
 let pageSize = 8;
 let totalResults = 0;
@@ -105,6 +106,10 @@ const createHtml = (cafe) => {
 
 // 2
 const renderCafe = (cafeList) => {
+  if (cafeList.length == 0) {
+    newMessage.innerHTML = `<li class="noList">검색 결과가 없습니다.</li>`;
+    return;
+  }
   const cafeHtml = cafeList.map((cafe) => createHtml(cafe)).join('');
   document.querySelector('.cafeList').innerHTML = cafeHtml;
 };
