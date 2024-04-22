@@ -305,6 +305,12 @@ main .sec2 .cafeList .cafe .desc .address .fa-location-dot {
 main .sec2 .cafeList .cafe .other {
   padding: 1rem;
 }
+main .sec2 .cafeList .noList {
+  text-align: center;
+  padding: 2rem 0;
+  font-size: 0.75em;
+  color: var(--gy);
+}
 
 main .pg {
   display: flex;
