@@ -19,7 +19,72 @@ let groupSize = 5;
   hdInner.appendChild(ham);
 */
 
+const moveToPage = async (pageNum) => {
+  page = pageNum;
+  const url = new URL(
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
+  );
+  await fetchCafe(url);
+};
+
+const pagination = () => {
+  let pageGroup = Math.ceil(page / groupSize);
+  let lastPage = Math.min(
+    Math.ceil(totalResults / pageSize),
+    pageGroup * groupSize
+  );
+  let firstPage = (pageGroup - 1) * groupSize + 1;
+  let paginationHtml = `<button class="prev"><i class="fa-solid fa-caret-left"></i></button>`;
+
+  for (let i = firstPage; i <= lastPage; i++) {
+    paginationHtml += `<button class="${
+      i == page ? 'on' : ''
+    }" onclick="moveToPage(${i})">${i}</button>`;
+  }
+  paginationHtml += `<button class="next"><i class="fa-solid fa-caret-right"></i></button>`;
+  document.querySelector('.pg').innerHTML = paginationHtml;
+};
+
+const errorRender = (message) => {
+  const errorHtml = `<li class="noList">ERROR ${message}</li>`;
+  newMessage.innerHTML = errorHtml;
+};
+
 const fetchCafe = async (url) => {
+  try {
+    url.searchParams.append('pageSize', pageSize);
+    url.searchParams.append('page', page);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+      },
+    });
+    const data = await response.json();
+    totalResults = data.totalResults;
+
+    if (response.status !== 200) {
+      throw new Error(data.message);
+    }
+
+    let cafeList = data.response.body.items.item;
+    renderCafe(cafeList);
+    pagination();
+  } catch (error) {
+    console.log('에러메시지 확인', error.message);
+    errorRender(error.message);
+  }
+};
+
+// 모든 데이터를 가져와서 검색어를 포함하는 데이터만 필터링
+// totalCount = 85
+const searchFn = async () => {
+  let searchWord = searchInput.value;
+  searchInput.value = '';
+  const url = new URL(`
+    https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=100" 
+  `);
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -28,16 +93,9 @@ const fetchCafe = async (url) => {
   });
   const data = await response.json();
   let cafeList = data.response.body.items.item;
-  renderCafe(cafeList);
-};
+  cafeList = cafeList.filter((item) => item.CON_KEYWORDS.includes(searchWord)); // 검색어 필터링
 
-const searchFn = () => {
-  const searchWord = searchInput.value;
-  searchInput.value = '';
-  const url = new URL(`
-    https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}&CON_KEYWORDS=${searchWord}
-  `);
-  fetchCafe(url);
+  renderCafe(cafeList);
 };
 
 searchBtn.addEventListener('click', async () => {
@@ -48,19 +106,6 @@ searchInput.addEventListener('keypress', (e) => {
   if (e.key !== 'Enter') return;
   searchFn();
 });
-
-//
-// searchBtn.addEventListener('click', async () => {
-//   const searchInput = document.querySelector('.inputArea input');
-//   const searchWord = searchInput.value;
-//   console.log(searchWord);
-
-//   const url = new URL(`
-//     https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}&CON_KEYWORDS=${searchWord}
-//   `);
-
-//   fetchCafe(url);
-// });
 
 // 3
 const createHtml = (cafe) => {
@@ -79,7 +124,7 @@ const createHtml = (cafe) => {
         <img
           src="https://www.gyeongju.go.kr/upload/content/${imgfilename}"
           alt="${title}"
-          onerror="this.onerror=null; this.src='../img/noImg.png'"
+          onerror="this.onerror=null; this.src='../img/noImg.png';"
         />
       </div>
       <div class="info">
@@ -151,3 +196,32 @@ const getLatestDatas = async () => {
 };
 
 getLatestDatas();
+
+const getTodaysCafe = async () => {
+  const url = new URL(
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
+  );
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+    },
+  });
+  const data = await response.json();
+  const todaysCafe = data.response.body.items.item;
+  return todaysCafe;
+};
+
+// 오늘의 카페를 화면에 랜덤으로 추가하는 함수
+const renderTodaysCafe = async () => {
+  const todaysCafe = await getTodaysCafe();
+  const randomIndex = Math.floor(Math.random() * todaysCafe.length); // 랜덤 인덱스 생성
+  const randomCafe = todaysCafe[randomIndex]; // 랜덤으로 선택된 카페 정보
+  const todaysCafeHtml = createHtml(randomCafe);
+  document.querySelector('.todaysCafe').innerHTML = todaysCafeHtml;
+};
+
+// 페이지 로드 시 오늘의 카페를 랜덤으로 추가
+window.addEventListener('load', () => {
+  renderTodaysCafe();
+});

@@ -207,15 +207,12 @@ main section h2 strong {
   display: block;
   padding: 2rem 0;
 }
-main .sec1 .todaysCafe {
+main .sec1 .todaysCafe > li {
   display: flex;
   justify-content: space-between;
 }
-main .sec1 .todaysCafe > div {
+main .sec1 .todaysCafe > li > div {
   width: 50%;
-}
-main .sec1 .todaysCafe > div.info {
-  position: relative;
 }
 main .sec1 .todaysCafe .img {
   border-right: 1px solid var(--bk);
@@ -237,14 +234,8 @@ main .sec1 .todaysCafe .deInfo {
   font-size: 1em;
   word-break: keep-all;
 }
-main .sec1 .todaysCafe .deInfo .simpleDesc {
-  /* font-size: 0.9em;
-  color: var(--gy);
-  margin-bottom: 1rem; */
-}
-main .sec1 .todaysCafe .deInfo .desc {
-}
-main .sec1 .todaysCafe .deInfo .address {
+main section .desc img {
+  display: none;
 }
 main section .other {
   position: absolute;
@@ -295,9 +286,6 @@ main .sec2 .cafeList .cafe .simpleDesc {
 }
 main .sec2 .cafeList .cafe .desc {
   line-height: 1.5;
-}
-main .sec2 .cafeList .cafe .desc img {
-  display: none;
 }
 main .sec2 .cafeList .cafe .desc .address .fa-location-dot {
   font-size: 0.9em;
