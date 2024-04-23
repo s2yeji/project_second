@@ -142,6 +142,7 @@ header h1 a {
   letter-spacing: -0.03em;
   line-height: 0.9;
   color: var(--point1);
+  position: relative;
   z-index: 10;
 }
 header .inner {
@@ -222,6 +223,9 @@ main .sec1 .todaysCafe .img img {
   height: 100%;
   object-fit: cover;
 }
+main section .cafe .info {
+  position: relative;
+}
 main section h3 {
   border-bottom: 1px solid var(--bk);
   padding: 2rem;
@@ -270,9 +274,6 @@ main .sec2 .cafeList .cafe .img img {
   object-fit: cover;
   border-bottom: 1px solid var(--bk);
 }
-main .sec2 .cafeList .cafe .info {
-  position: relative;
-}
 main .sec2 .cafeList .cafe h3 {
   padding: 1rem;
   font-size: var(--size);
@@ -283,6 +284,7 @@ main .sec2 .cafeList .cafe .deInfo {
 }
 main .sec2 .cafeList .cafe .simpleDesc {
   margin-bottom: 1rem;
+  color: var(--gy);
 }
 main .sec2 .cafeList .cafe .desc {
   line-height: 1.5;

@@ -164,13 +164,6 @@ const getLatestDatas = async () => {
   const url = new URL(
     `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}`
   );
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-    },
-  });
-
   /*
     const img = dataList.map((item) => item.CON_IMGFILENAME);
     const title = dataList.map((item) => item.CON_TITLE);
@@ -197,31 +190,43 @@ const getLatestDatas = async () => {
 
 getLatestDatas();
 
-const getTodaysCafe = async () => {
+const getRandomData = async () => {
+  const randomIndex = Math.floor(Math.random() * todaysCafe.length);
+  const randomCafe = todaysCafe[randomIndex];
   const url = new URL(
-    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${randomCafe}&numOfRows=1`
   );
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-    },
-  });
-  const data = await response.json();
-  const todaysCafe = data.response.body.items.item;
-  return todaysCafe;
+
+  fetchCafe(url);
 };
 
-// 오늘의 카페를 화면에 랜덤으로 추가하는 함수
-const renderTodaysCafe = async () => {
-  const todaysCafe = await getTodaysCafe();
-  const randomIndex = Math.floor(Math.random() * todaysCafe.length); // 랜덤 인덱스 생성
-  const randomCafe = todaysCafe[randomIndex]; // 랜덤으로 선택된 카페 정보
-  const todaysCafeHtml = createHtml(randomCafe);
-  document.querySelector('.todaysCafe').innerHTML = todaysCafeHtml;
-};
+// getRandomData();
 
-// 페이지 로드 시 오늘의 카페를 랜덤으로 추가
-window.addEventListener('load', () => {
-  renderTodaysCafe();
-});
+// const getTodaysCafe = async () => {
+//   const url = new URL(
+//     `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
+//   );
+//   const response = await fetch(url, {
+//     method: 'GET',
+//     headers: {
+//       accept: 'application/json',
+//     },
+//   });
+//   const data = await response.json();
+//   const todaysCafe = data.response.body.items.item;
+//   return todaysCafe;
+// };
+
+// // 오늘의 카페를 화면에 랜덤으로 추가하는 함수
+// const renderTodaysCafe = async () => {
+//   const todaysCafe = await getTodaysCafe();
+//   const randomIndex = Math.floor(Math.random() * todaysCafe.length); // 랜덤 인덱스 생성
+//   const randomCafe = todaysCafe[randomIndex]; // 랜덤으로 선택된 카페 정보
+//   const todaysCafeHtml = createHtml(randomCafe);
+//   document.querySelector('.todaysCafe').innerHTML = todaysCafeHtml;
+// };
+
+// // 페이지 로드 시 오늘의 카페를 랜덤으로 추가
+// window.addEventListener('load', () => {
+//   renderTodaysCafe();
+// });
