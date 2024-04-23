@@ -4,9 +4,10 @@ const searchBtn = document.querySelector('.btnSearch');
 const searchInput = document.querySelector('.inputArea input');
 const newMessage = document.querySelector('.cafeList');
 let page = 1;
-let pageSize = 8;
+let pageSize = 4;
 let totalResults = 0;
 let groupSize = 5;
+let currentPage = 1;
 
 /*
   const ham = document.createElement('div');
@@ -21,27 +22,41 @@ let groupSize = 5;
 
 const moveToPage = async (pageNum) => {
   page = pageNum;
+  currentPage = pageNum;
   const url = new URL(
-    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${page}&numOfRows=${pageSize}`
   );
   await fetchCafe(url);
 };
 
 const pagination = () => {
   let pageGroup = Math.ceil(page / groupSize);
+  console.log('#################### : ', pageGroup);
   let lastPage = Math.min(
     Math.ceil(totalResults / pageSize),
     pageGroup * groupSize
   );
   let firstPage = (pageGroup - 1) * groupSize + 1;
-  let paginationHtml = `<button class="prev"><i class="fa-solid fa-caret-left"></i></button>`;
+  let totalPage = Math.ceil(totalResults / pageSize);
+
+  let paginationHtml = `<button class="prev" ${
+    page == 1 ? 'disabled' : ''
+  } onclick="moveToPage(${
+    currentPage - 1
+  })"><i class="fa-solid fa-caret-left"></i></button>`;
 
   for (let i = firstPage; i <= lastPage; i++) {
     paginationHtml += `<button class="${
       i == page ? 'on' : ''
     }" onclick="moveToPage(${i})">${i}</button>`;
   }
-  paginationHtml += `<button class="next"><i class="fa-solid fa-caret-right"></i></button>`;
+
+  paginationHtml += `<button class="next" ${
+    page >= totalPage ? 'disabled' : ''
+  } onclick="moveToPage(${
+    currentPage + 1
+  })"><i class="fa-solid fa-caret-right"></i></button>`;
+
   document.querySelector('.pg').innerHTML = paginationHtml;
 };
 
@@ -62,7 +77,8 @@ const fetchCafe = async (url) => {
       },
     });
     const data = await response.json();
-    totalResults = data.totalResults;
+    totalResults = data.response.body.totalCount;
+    console.log(totalResults);
 
     if (response.status !== 200) {
       throw new Error(data.message);
@@ -189,44 +205,3 @@ const getLatestDatas = async () => {
 };
 
 getLatestDatas();
-
-const getRandomData = async () => {
-  const randomIndex = Math.floor(Math.random() * todaysCafe.length);
-  const randomCafe = todaysCafe[randomIndex];
-  const url = new URL(
-    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${randomCafe}&numOfRows=1`
-  );
-
-  fetchCafe(url);
-};
-
-// getRandomData();
-
-// const getTodaysCafe = async () => {
-//   const url = new URL(
-//     `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}`
-//   );
-//   const response = await fetch(url, {
-//     method: 'GET',
-//     headers: {
-//       accept: 'application/json',
-//     },
-//   });
-//   const data = await response.json();
-//   const todaysCafe = data.response.body.items.item;
-//   return todaysCafe;
-// };
-
-// // 오늘의 카페를 화면에 랜덤으로 추가하는 함수
-// const renderTodaysCafe = async () => {
-//   const todaysCafe = await getTodaysCafe();
-//   const randomIndex = Math.floor(Math.random() * todaysCafe.length); // 랜덤 인덱스 생성
-//   const randomCafe = todaysCafe[randomIndex]; // 랜덤으로 선택된 카페 정보
-//   const todaysCafeHtml = createHtml(randomCafe);
-//   document.querySelector('.todaysCafe').innerHTML = todaysCafeHtml;
-// };
-
-// // 페이지 로드 시 오늘의 카페를 랜덤으로 추가
-// window.addEventListener('load', () => {
-//   renderTodaysCafe();
-// });
