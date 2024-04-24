@@ -208,11 +208,11 @@ main section h2 strong {
   display: block;
   padding: 2rem 0;
 }
-main .sec1 .todaysCafe > li {
+main .sec1 .todaysCafe .cafe {
   display: flex;
   justify-content: space-between;
 }
-main .sec1 .todaysCafe > li > div {
+main .sec1 .todaysCafe .cafe > div {
   width: 50%;
 }
 main .sec1 .todaysCafe .img {
@@ -282,11 +282,11 @@ main .sec2 .cafeList .cafe .deInfo {
   padding: 1rem;
   font-size: 0.9em;
 }
-main .sec2 .cafeList .cafe .simpleDesc {
+main section .simpleDesc {
   margin-bottom: 1rem;
   color: var(--gy);
 }
-main .sec2 .cafeList .cafe .desc {
+main section .desc {
   line-height: 1.5;
 }
 main .sec2 .cafeList .cafe .desc .address .fa-location-dot {

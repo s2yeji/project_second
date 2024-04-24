@@ -4,7 +4,7 @@ const searchBtn = document.querySelector('.btnSearch');
 const searchInput = document.querySelector('.inputArea input');
 const newMessage = document.querySelector('.cafeList');
 let page = 1;
-let pageSize = 4;
+let pageSize = 8;
 let totalResults = 0;
 let groupSize = 5;
 let currentPage = 1;
@@ -31,7 +31,6 @@ const moveToPage = async (pageNum) => {
 
 const pagination = () => {
   let pageGroup = Math.ceil(page / groupSize);
-  console.log('#################### : ', pageGroup);
   let lastPage = Math.min(
     Math.ceil(totalResults / pageSize),
     pageGroup * groupSize
@@ -39,11 +38,14 @@ const pagination = () => {
   let firstPage = (pageGroup - 1) * groupSize + 1;
   let totalPage = Math.ceil(totalResults / pageSize);
 
-  let paginationHtml = `<button class="prev" ${
+  let paginationHtml = `
+  <button class="first" ${
     page == 1 ? 'disabled' : ''
-  } onclick="moveToPage(${
+  } onclick="moveToPage(${firstPage})"><i class="fa-solid fa-angles-left"></i></button>
+  <button class="prev" ${page == 1 ? 'disabled' : ''} onclick="moveToPage(${
     currentPage - 1
-  })"><i class="fa-solid fa-caret-left"></i></button>`;
+  })"><i class="fa-solid fa-chevron-left"></i></button>
+  `;
 
   for (let i = firstPage; i <= lastPage; i++) {
     paginationHtml += `<button class="${
@@ -51,11 +53,16 @@ const pagination = () => {
     }" onclick="moveToPage(${i})">${i}</button>`;
   }
 
-  paginationHtml += `<button class="next" ${
+  paginationHtml += `
+  <button class="next" ${
     page >= totalPage ? 'disabled' : ''
   } onclick="moveToPage(${
     currentPage + 1
-  })"><i class="fa-solid fa-caret-right"></i></button>`;
+  })"><i class="fa-solid fa-chevron-right"></i></button>
+  <button class="last" ${
+    page >= totalPage ? 'disabled' : ''
+  } onclick="moveToPage(${lastPage})"><i class="fa-solid fa-angles-right"></i></button>
+  `;
 
   document.querySelector('.pg').innerHTML = paginationHtml;
 };
@@ -205,3 +212,62 @@ const getLatestDatas = async () => {
 };
 
 getLatestDatas();
+
+// 오늘의 카페
+const getRandomCafe = async () => {
+  let randomPageNo = Math.floor(Math.random() * 85) + 1;
+
+  const url = new URL(
+    `https://apis.data.go.kr/5050000/cafeInfoService/getCafeInfo?serviceKey=${API_KEY}&pageNo=${randomPageNo}&numOfRows=1`
+  );
+  const response = await fetch(url);
+  const data = await response.json();
+  let randomCafe = data.response.body.items.item;
+
+  renderRandomCafe(randomCafe);
+};
+
+const randomHtml = (cafe) => {
+  let imgfilename = cafe.CON_IMGFILENAME || '../img/noImg.png';
+  let title = cafe.CON_TITLE;
+  let simpleDesc = cafe.SRC_TITLE;
+  let desc = cafe.CON_CONTENT;
+  let address = cafe.CON_ADDRESS;
+  let homepage = cafe.CON_HOMEPAGE;
+  let phone = cafe.CON_PHONE;
+
+  return `
+    <div class="img">
+      <img
+        src="https://www.gyeongju.go.kr/upload/content/${imgfilename}"
+        alt="${title}"
+        onerror="this.onerror=null; this.src='../img/noImg.png';"
+      />
+    </div>
+    <div class="info">
+      <h3>${title}</h3>
+      <div class="deInfo">
+        <div class="simpleDesc">${simpleDesc}</div>
+        <div class="desc">${desc}</div>
+        <div class="address"><i class="fa-solid fa-location-dot"></i> ${address}</div>
+        <div class="other">
+          <a
+            href="${homepage}"
+            target="_blank"
+            ><i class="fa-solid fa-house"></i
+          ></a>
+          <a href="tel:${phone}"
+            ><i class="fa-solid fa-mobile-screen-button"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+const renderRandomCafe = (randomCafe) => {
+  const randomHtml = randomCafe.map((cafe) => createHtml(cafe)).join('');
+  document.querySelector('.todaysCafe').innerHTML = randomHtml;
+};
+
+getRandomCafe();
